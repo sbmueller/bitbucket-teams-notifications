@@ -5,6 +5,7 @@ extern crate reqwest;
 use rocket::serde::json::Json;
 
 mod bitbucket;
+mod mapper;
 mod teams;
 
 /// Event handler for incoming BitBucket webhooks.
@@ -16,7 +17,7 @@ mod teams;
 async fn prupdate(teams_url: &str, payload: Json<bitbucket::Payload<'_>>) -> rocket::http::Status {
     // Map payload to teams structure
     let bitbucket_payload = payload.into_inner();
-    let teams_payload = teams::Payload::from_bitbucket(&bitbucket_payload);
+    let teams_payload = mapper::bitbucket_to_teams(&bitbucket_payload);
     // Make request to teams url
     let client = reqwest::Client::new();
     let decoded_url = html_escape::decode_html_entities(teams_url);
@@ -48,7 +49,7 @@ mod tests {
     #[test]
     fn test_conversion_pr_opened() {
         let bitbucket_data = bitbucket::Payload::dummy("pr:opened");
-        let teams_data = teams::Payload::from_bitbucket(&bitbucket_data);
+        let teams_data = mapper::bitbucket_to_teams(&bitbucket_data);
         assert_eq!(
             teams_data.attachments[0].content.body.text,
             "John Doe opened PR 123: Refactor."
@@ -58,7 +59,7 @@ mod tests {
     #[test]
     fn test_conversion_pr_modified() {
         let bitbucket_data = bitbucket::Payload::dummy("pr:modified");
-        let teams_data = teams::Payload::from_bitbucket(&bitbucket_data);
+        let teams_data = mapper::bitbucket_to_teams(&bitbucket_data);
         assert_eq!(
             teams_data.attachments[0].content.body.text,
             "John Doe changed PR 123: Refactor."
@@ -68,7 +69,7 @@ mod tests {
     #[test]
     fn test_conversion_pr_approved() {
         let bitbucket_data = bitbucket::Payload::dummy("pr:reviewer:approved");
-        let teams_data = teams::Payload::from_bitbucket(&bitbucket_data);
+        let teams_data = mapper::bitbucket_to_teams(&bitbucket_data);
         assert_eq!(
             teams_data.attachments[0].content.body.text,
             "John Doe approved PR 123: Refactor."
@@ -78,7 +79,7 @@ mod tests {
     #[test]
     fn test_conversion_pr_needs_work() {
         let bitbucket_data = bitbucket::Payload::dummy("pr:reviewer:needs_work");
-        let teams_data = teams::Payload::from_bitbucket(&bitbucket_data);
+        let teams_data = mapper::bitbucket_to_teams(&bitbucket_data);
         assert_eq!(
             teams_data.attachments[0].content.body.text,
             "John Doe requested work on PR 123: Refactor."
@@ -88,7 +89,7 @@ mod tests {
     #[test]
     fn test_conversion_pr_merged() {
         let bitbucket_data = bitbucket::Payload::dummy("pr:merged");
-        let teams_data = teams::Payload::from_bitbucket(&bitbucket_data);
+        let teams_data = mapper::bitbucket_to_teams(&bitbucket_data);
         assert_eq!(
             teams_data.attachments[0].content.body.text,
             "John Doe merged PR 123: Refactor."
@@ -98,7 +99,7 @@ mod tests {
     #[test]
     fn test_pr_link() {
         let bitbucket_data = bitbucket::Payload::dummy("pr:merged");
-        let teams_data = teams::Payload::from_bitbucket(&bitbucket_data);
+        let teams_data = mapper::bitbucket_to_teams(&bitbucket_data);
         assert_eq!(
             teams_data.attachments[0].content_url,
             Some("http://test.url/")
