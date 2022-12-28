@@ -7,34 +7,34 @@ use rocket::serde::Serialize;
 #[serde(crate = "rocket::serde")]
 pub struct Payload<'r> {
     r#type: &'r str,
-    attachments: Vec<Card<'r>>,
+    pub attachments: Vec<Card<'r>>,
 }
 
 #[derive(Debug, Serialize)]
 #[serde(crate = "rocket::serde")]
-struct Card<'r> {
+pub struct Card<'r> {
     #[serde(rename = "contentType")]
     content_type: &'r str,
     #[serde(rename = "contentUrl")]
     content_url: Option<&'r str>,
-    content: Content<'r>,
+    pub content: Content<'r>,
 }
 
 #[derive(Debug, Serialize)]
 #[serde(crate = "rocket::serde")]
-struct Content<'r> {
+pub struct Content<'r> {
     #[serde(rename = "$schema")]
     schema: &'r str,
     r#type: &'r str,
     version: &'r str,
-    body: Body<'r>,
+    pub body: Body<'r>,
 }
 
 #[derive(Debug, Serialize)]
 #[serde(crate = "rocket::serde")]
-struct Body<'r> {
+pub struct Body<'r> {
     r#type: &'r str,
-    text: String,
+    pub text: String,
 }
 
 impl<'r> Payload<'r> {
@@ -58,8 +58,19 @@ impl<'r> Payload<'r> {
     }
 
     pub fn from_bitbucket(bitbucket: &'r bitbucket::Payload) -> Self {
-        // TODO: Write better message
-        let message = format!("{} opened new PR.", bitbucket.actor.display_name);
+        let actor = bitbucket.actor.display_name;
+        let id = bitbucket.pull_request.id;
+        let title = bitbucket.pull_request.title;
+        let message = match bitbucket.event_key {
+            "pr:opened" => format!("{actor} opened PR {id}: {title}."),
+            "pr:modified" => format!("{actor} changed PR {id}: {title}."),
+            "pr:reviewer:approved" => format!("{actor} approved PR {id}: {title}."),
+            "pr:reviewer:needs_work" => {
+                format!("{actor} requested work on PR {id}: {title}.")
+            }
+            "pr:merged" => format!("{actor} merged PR {id}: {title}."),
+            _ => "Unknown event_key".to_string(),
+        };
         Payload::new(message)
     }
 }

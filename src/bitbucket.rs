@@ -29,9 +29,9 @@ pub struct Actor<'r> {
 
 impl<'r> Payload<'r> {
     #[allow(dead_code)]
-    pub fn dummy() -> Payload<'r> {
+    pub fn dummy(event_key: &'r str) -> Payload<'r> {
         Payload {
-            event_key: "pr:opened",
+            event_key,
             pull_request: PullRequest {
                 id: 123,
                 title: "Refactor",
