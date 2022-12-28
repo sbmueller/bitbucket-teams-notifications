@@ -28,6 +28,7 @@ pub struct Actor<'r> {
 }
 
 impl<'r> Payload<'r> {
+    #[allow(dead_code)]
     pub fn dummy() -> Payload<'r> {
         Payload {
             event_key: "pr:opened",

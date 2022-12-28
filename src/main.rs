@@ -20,7 +20,7 @@ async fn prupdate(teams_url: &str, payload: Json<bitbucket::Payload<'_>>) -> roc
     // Make request to teams url
     let client = reqwest::Client::new();
     let decoded_url = html_escape::decode_html_entities(teams_url);
-    println!("{}", decoded_url);
+    println!("{decoded_url}");
     match client
         .post(decoded_url.as_ref())
         .json(&teams_payload)
@@ -29,7 +29,7 @@ async fn prupdate(teams_url: &str, payload: Json<bitbucket::Payload<'_>>) -> roc
     {
         Ok(_) => rocket::http::Status::Ok,
         Err(e) => {
-            println!("{}", e);
+            println!("{e}");
             rocket::http::Status::InternalServerError
         }
     }
