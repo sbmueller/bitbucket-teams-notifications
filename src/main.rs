@@ -96,6 +96,16 @@ mod tests {
     }
 
     #[test]
+    fn test_pr_link() {
+        let bitbucket_data = bitbucket::Payload::dummy("pr:merged");
+        let teams_data = teams::Payload::from_bitbucket(&bitbucket_data);
+        assert_eq!(
+            teams_data.attachments[0].content_url,
+            Some("http://test.url/")
+        );
+    }
+
+    #[test]
     fn test_request() {
         let target_url = html_escape::encode_safe("https://httpbin.org/post").to_string();
         let rocket = super::rocket();

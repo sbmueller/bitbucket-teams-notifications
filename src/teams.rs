@@ -16,7 +16,7 @@ pub struct Card<'r> {
     #[serde(rename = "contentType")]
     content_type: &'r str,
     #[serde(rename = "contentUrl")]
-    content_url: Option<&'r str>,
+    pub content_url: Option<&'r str>,
     pub content: Content<'r>,
 }
 
@@ -38,12 +38,12 @@ pub struct Body<'r> {
 }
 
 impl<'r> Payload<'r> {
-    pub fn new(message: String) -> Self {
+    pub fn new(message: String, href: &'r str) -> Self {
         Payload {
             r#type: "message",
             attachments: vec![Card {
                 content_type: "application/vnd.microsoft.card.adaptive",
-                content_url: None,
+                content_url: Some(href),
                 content: Content {
                     schema: "http://adaptivecards.io/schemas/adaptive-card.json",
                     r#type: "AdaptiveCard",
@@ -71,6 +71,6 @@ impl<'r> Payload<'r> {
             "pr:merged" => format!("{actor} merged PR {id}: {title}."),
             _ => "Unknown event_key".to_string(),
         };
-        Payload::new(message)
+        Payload::new(message, bitbucket.pull_request.links[0].href)
     }
 }
