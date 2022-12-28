@@ -3,14 +3,14 @@
 use crate::bitbucket;
 use rocket::serde::Serialize;
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 #[serde(crate = "rocket::serde")]
 pub struct Payload<'r> {
     r#type: &'r str,
     attachments: Vec<Card<'r>>,
 }
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 #[serde(crate = "rocket::serde")]
 struct Card<'r> {
     #[serde(rename = "contentType")]
@@ -20,7 +20,7 @@ struct Card<'r> {
     content: Content<'r>,
 }
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 #[serde(crate = "rocket::serde")]
 struct Content<'r> {
     #[serde(rename = "$schema")]
@@ -30,7 +30,7 @@ struct Content<'r> {
     body: Body<'r>,
 }
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 #[serde(crate = "rocket::serde")]
 struct Body<'r> {
     r#type: &'r str,
