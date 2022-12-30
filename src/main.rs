@@ -47,66 +47,6 @@ mod tests {
     use rocket::local::blocking::Client;
 
     #[test]
-    fn test_conversion_pr_opened() {
-        let bitbucket_data = bitbucket::Payload::dummy("pr:opened");
-        let teams_data = mapper::bitbucket_to_teams(&bitbucket_data);
-        assert_eq!(
-            teams_data.attachments[0].content.body.text,
-            "John Doe opened PR 123: Refactor."
-        );
-    }
-
-    #[test]
-    fn test_conversion_pr_modified() {
-        let bitbucket_data = bitbucket::Payload::dummy("pr:modified");
-        let teams_data = mapper::bitbucket_to_teams(&bitbucket_data);
-        assert_eq!(
-            teams_data.attachments[0].content.body.text,
-            "John Doe changed PR 123: Refactor."
-        );
-    }
-
-    #[test]
-    fn test_conversion_pr_approved() {
-        let bitbucket_data = bitbucket::Payload::dummy("pr:reviewer:approved");
-        let teams_data = mapper::bitbucket_to_teams(&bitbucket_data);
-        assert_eq!(
-            teams_data.attachments[0].content.body.text,
-            "John Doe approved PR 123: Refactor."
-        );
-    }
-
-    #[test]
-    fn test_conversion_pr_needs_work() {
-        let bitbucket_data = bitbucket::Payload::dummy("pr:reviewer:needs_work");
-        let teams_data = mapper::bitbucket_to_teams(&bitbucket_data);
-        assert_eq!(
-            teams_data.attachments[0].content.body.text,
-            "John Doe requested work on PR 123: Refactor."
-        );
-    }
-
-    #[test]
-    fn test_conversion_pr_merged() {
-        let bitbucket_data = bitbucket::Payload::dummy("pr:merged");
-        let teams_data = mapper::bitbucket_to_teams(&bitbucket_data);
-        assert_eq!(
-            teams_data.attachments[0].content.body.text,
-            "John Doe merged PR 123: Refactor."
-        );
-    }
-
-    #[test]
-    fn test_pr_link() {
-        let bitbucket_data = bitbucket::Payload::dummy("pr:merged");
-        let teams_data = mapper::bitbucket_to_teams(&bitbucket_data);
-        assert_eq!(
-            teams_data.attachments[0].content_url,
-            Some("http://test.url/")
-        );
-    }
-
-    #[test]
     fn test_request() {
         let target_url = html_escape::encode_safe("https://httpbin.org/post").to_string();
         let rocket = super::rocket();
