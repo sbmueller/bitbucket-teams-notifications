@@ -37,12 +37,12 @@ pub struct Body<'r> {
 }
 
 impl<'r> Payload<'r> {
-    pub fn new(message: String, href: &'r str) -> Self {
+    pub fn new(message: String) -> Self {
         Payload {
             r#type: "message",
             attachments: vec![Card {
                 content_type: "application/vnd.microsoft.card.adaptive",
-                content_url: Some(href),
+                content_url: None,
                 content: Content {
                     schema: "http://adaptivecards.io/schemas/adaptive-card.json",
                     r#type: "AdaptiveCard",

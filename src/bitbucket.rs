@@ -18,7 +18,7 @@ pub struct Payload<'r> {
 pub struct PullRequest<'r> {
     pub id: u64,
     pub title: &'r str,
-    pub links: Vec<Href<'r>>,
+    // pub links: Vec<Href<'r>>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -28,11 +28,11 @@ pub struct Actor<'r> {
     pub display_name: &'r str,
 }
 
-#[derive(Serialize, Deserialize)]
-#[serde(crate = "rocket::serde")]
-pub struct Href<'r> {
-    pub href: &'r str,
-}
+// #[derive(Serialize, Deserialize)]
+// #[serde(crate = "rocket::serde")]
+// pub struct Href<'r> {
+//     pub href: &'r str,
+// }
 
 impl<'r> Payload<'r> {
     #[allow(dead_code)]
@@ -42,9 +42,6 @@ impl<'r> Payload<'r> {
             pull_request: PullRequest {
                 id: 123,
                 title: "Refactor",
-                links: vec![Href {
-                    href: "http://test.url/",
-                }],
             },
             actor: Actor {
                 display_name: "John Doe",
