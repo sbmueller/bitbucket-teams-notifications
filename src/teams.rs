@@ -15,7 +15,7 @@ pub struct Card<'r> {
     #[serde(rename = "contentType")]
     content_type: &'r str,
     #[serde(rename = "contentUrl")]
-    pub content_url: Option<&'r str>,
+    pub content_url: Option<String>,
     pub content: Content<'r>,
 }
 
@@ -37,12 +37,12 @@ pub struct Body<'r> {
 }
 
 impl<'r> Payload<'r> {
-    pub fn new(message: String) -> Self {
+    pub fn new(message: String, url: Option<String>) -> Self {
         Payload {
             r#type: "message",
             attachments: vec![Card {
                 content_type: "application/vnd.microsoft.card.adaptive",
-                content_url: None,
+                content_url: url,
                 content: Content {
                     schema: "http://adaptivecards.io/schemas/adaptive-card.json",
                     r#type: "AdaptiveCard",

@@ -18,7 +18,7 @@ pub struct Payload<'r> {
 pub struct PullRequest<'r> {
     pub id: u64,
     pub title: &'r str,
-    // pub links: Vec<Href<'r>>,
+    pub links: SelfLinks,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -28,11 +28,18 @@ pub struct Actor<'r> {
     pub display_name: &'r str,
 }
 
-// #[derive(Serialize, Deserialize)]
-// #[serde(crate = "rocket::serde")]
-// pub struct Href<'r> {
-//     pub href: &'r str,
-// }
+#[derive(Serialize, Deserialize)]
+#[serde(crate = "rocket::serde")]
+pub struct SelfLinks {
+    #[serde(rename = "self")]
+    pub selflinks: Vec<Option<Href>>,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(crate = "rocket::serde")]
+pub struct Href {
+    pub href: String,
+}
 
 impl<'r> Payload<'r> {
     #[allow(dead_code)]
@@ -42,6 +49,11 @@ impl<'r> Payload<'r> {
             pull_request: PullRequest {
                 id: 123,
                 title: "Refactor",
+                links: SelfLinks {
+                    selflinks: vec![Some(Href {
+                        href: "http://test.site/".to_string(),
+                    })],
+                },
             },
             actor: Actor {
                 display_name: "John Doe",

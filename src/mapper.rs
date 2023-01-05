@@ -4,6 +4,9 @@ pub fn bitbucket_to_teams<'r>(input: &'r bitbucket::Payload) -> teams::Payload<'
     let actor = input.actor.display_name;
     let id = input.pull_request.id;
     let title = input.pull_request.title;
+    let url = input.pull_request.links.selflinks[0]
+        .as_ref()
+        .map(|o| o.href.clone());
     let message = match input.event_key {
         "pr:opened" => format!("{actor} opened PR {id}: {title}."),
         "pr:modified" => format!("{actor} changed PR {id}: {title}."),
@@ -14,7 +17,7 @@ pub fn bitbucket_to_teams<'r>(input: &'r bitbucket::Payload) -> teams::Payload<'
         "pr:merged" => format!("{actor} merged PR {id}: {title}."),
         _ => "Unknown event_key".to_string(),
     };
-    teams::Payload::new(message)
+    teams::Payload::new(message, url)
 }
 
 #[cfg(test)]
@@ -175,13 +178,21 @@ mod tests {
         );
     }
 
-    // #[test]
-    // fn test_pr_link() {
-    //     let bitbucket_data = bitbucket::Payload::dummy("pr:merged");
-    //     let teams_data = bitbucket_to_teams(&bitbucket_data);
-    //     assert_eq!(
-    //         teams_data.attachments[0].content_url,
-    //         Some("http://test.url/")
-    //     );
-    // }
+    #[test]
+    fn test_pr_link() {
+        let bitbucket_data = bitbucket::Payload::dummy("pr:merged");
+        let teams_data = bitbucket_to_teams(&bitbucket_data);
+        assert_eq!(
+            teams_data.attachments[0].content_url,
+            Some("http://test.site/".to_string())
+        );
+    }
+
+    #[test]
+    fn test_missing_pr_link() {
+        let mut bitbucket_data = bitbucket::Payload::dummy("pr:merged");
+        bitbucket_data.pull_request.links.selflinks[0] = None;
+        let teams_data = bitbucket_to_teams(&bitbucket_data);
+        assert_eq!(teams_data.attachments[0].content_url, None);
+    }
 }
