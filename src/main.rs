@@ -1,6 +1,5 @@
 #[macro_use]
 extern crate rocket;
-extern crate html_escape;
 extern crate reqwest;
 use rocket::serde::json::Json;
 
@@ -20,14 +19,9 @@ async fn prupdate(teams_url: &str, payload: Json<bitbucket::Payload<'_>>) -> roc
     let teams_payload = mapper::bitbucket_to_teams(&bitbucket_payload);
     // Make request to teams url
     let client = reqwest::Client::new();
-    let decoded_url = html_escape::decode_html_entities(teams_url);
+    let decoded_url = str::replace(teams_url, "+", "/");
     println!("{decoded_url}");
-    match client
-        .post(decoded_url.as_ref())
-        .json(&teams_payload)
-        .send()
-        .await
-    {
+    match client.post(decoded_url).json(&teams_payload).send().await {
         Ok(_) => rocket::http::Status::Ok,
         Err(e) => {
             println!("{e}");
@@ -48,7 +42,7 @@ mod tests {
 
     #[test]
     fn test_request_with_dummy() {
-        let target_url = html_escape::encode_safe("https://httpbin.org/post").to_string();
+        let target_url = "https:++httpbin.org+post";
         let rocket = super::rocket();
         let client = Client::tracked(rocket).unwrap();
         let req = client
@@ -155,7 +149,7 @@ mod tests {
     }
   }
 }"#;
-        let target_url = html_escape::encode_safe("https://httpbin.org/post").to_string();
+        let target_url = "https:++httpbin.org+post";
         let rocket = super::rocket();
         let client = Client::tracked(rocket).unwrap();
         let req = client
